@@ -28,6 +28,9 @@ function promptUser() {
             case 'view all roles':
                 viewAllRoles();
                 break;
+            case 'view all employees':
+                viewAllEmployees();
+                break;
         }
     });
 }
@@ -48,4 +51,15 @@ function viewAllRoles() {
         console.table(results);
         promptUser();
     });
+}
+
+function viewAllEmployees() {
+    connection.query(
+        'SELECT employee.id, employee.first_name, employee.last_name, role.title AS job_title, department.name AS department, role.salary, CONCAT(manager.first_name, ``, manager.last_name) AS manager FROM employee JOIN role ON employee.role_id = role.id  JOIN department ON role.department_id = department.id LEFT JOIN employee AS manager ON employee.managerid = manager.id',
+        (err, results) => {
+            if (err) throw err; 
+            console.table(results);
+            promptUser();
+        }
+    );
 }
