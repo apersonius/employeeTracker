@@ -25,6 +25,9 @@ function promptUser() {
             case 'view all departments()':
                 viewAllDepartments();
                 break;
+            case 'view all roles':
+                viewAllRoles();
+                break;
         }
     });
 }
@@ -35,5 +38,14 @@ function viewAllDepartments() {
         console.log('\n');
         console.table((results));
         promptUser();
-    })
+    });
+}
+
+function viewAllRoles() {
+    connection.query('SELECT role.id, role.title, department.name AS department, role.salary FROM role JOIN department ON role.department_id = department.id',
+    (err, results) => {
+        if (err) throw err;
+        console.table(results);
+        promptUser();
+    });
 }
