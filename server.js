@@ -31,6 +31,21 @@ function promptUser() {
             case 'view all employees':
                 viewAllEmployees();
                 break;
+            case 'add a department':
+                addDepartment();
+                break;
+            case 'add a role':
+                addRole();
+                break;
+            case 'add an employee':
+                addEmployee();
+                break;
+            case 'update an employee role':
+                updateEmployeeRole();
+                break;
+            case 'exit':
+                connection.end();
+                break;
         }
     });
 }
