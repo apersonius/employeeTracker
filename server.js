@@ -20,4 +20,20 @@ function promptUser() {
             ],
         },
     ])
+    .then((answer) => {
+        switch (answer.action) {
+            case 'view all departments()':
+                viewAllDepartments();
+                break;
+        }
+    });
+}
+
+function viewAllDepartments() {
+    connection.query('SELECT * FROM department', (err, results) => {
+        if (err) throw err;
+        console.log('\n');
+        console.table((results));
+        promptUser();
+    })
 }
