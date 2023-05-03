@@ -1,1 +1,2 @@
-// server.js
+const inquirer = require('inquirer');
+
