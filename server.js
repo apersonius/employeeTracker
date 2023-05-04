@@ -1,6 +1,6 @@
 const inquirer = require('inquirer');
 const connection = require('./db/connection');
-const consoleTable = require('console.table');
+require('console.table');
 
 function promptUser() {
     inquirer
@@ -23,7 +23,7 @@ function promptUser() {
     ])
     .then((answer) => {
         switch (answer.action) {
-            case 'view all departments()':
+            case 'view all departments':
                 viewAllDepartments();
                 break;
             case 'view all roles':
@@ -55,7 +55,7 @@ function viewAllDepartments() {
     connection.query('SELECT * FROM department', (err, results) => {
         if (err) throw err;
         console.log('\n');
-        console.table((results));
+        console.table(results);
         promptUser();
     });
 }
@@ -69,15 +69,24 @@ function viewAllRoles() {
     });
 }
 
+// function viewAllEmployees() {
+//     connection.query(
+//         'SELECT employee.id, employee.first_name, employee.last_name, role.title AS job_title, department.name AS department, role.salary, CONCAT(manager.first_name, ``, manager.last_name) AS manager FROM employee JOIN role ON employee.role_id = role.id  JOIN department ON role.department_id = department.id LEFT JOIN employee AS manager ON employee.managerid = manager.id',
+//         (err, results) => {
+//             if (err) throw err; 
+//             console.table(results);
+//             promptUser();
+//         }
+//     );
+// }
+
 function viewAllEmployees() {
-    connection.query(
-        'SELECT employee.id, employee.first_name, employee.last_name, role.title AS job_title, department.name AS department, role.salary, CONCAT(manager.first_name, ``, manager.last_name) AS manager FROM employee JOIN role ON employee.role_id = role.id  JOIN department ON role.department_id = department.id LEFT JOIN employee AS manager ON employee.managerid = manager.id',
-        (err, results) => {
-            if (err) throw err; 
+    connection.query('SELECT employee.id, employee.first_name, employee.last_name, role.title AS job_title, department.name AS department, role.salary, CONCAT(manager.first_name, manager.last_name) AS manager FROM employee JOIN role ON employee.role_id = role.id  JOIN department ON role.department_id = department.id LEFT JOIN employee AS manager ON employee.manager_id = manager.id',
+     (err, results) => {
+        if (err) throw err;
             console.table(results);
             promptUser();
-        }
-    );
+});
 }
 
 function addDepartment() {
@@ -169,25 +178,29 @@ function addEmployee() {
                     type: 'list',
                     name: 'roleId',
                     message: 'choose employees role',
-                    choices: role.map((role) => role.title),
+                    choices: role.map((role) => ({
+                        name: role.title,
+                        value: role.id,
+                    })),
                 },
                 {
                     type: 'list',
                     name: 'managerId',
-                    message: 'chooise the employees manager',
-                    choices: manager.map((manager) => `${manger.first_name} ${manager.last_name}`,
+                    message: 'choose the employees manager',
+                    choices: manager.map((manager) => ({
+                        name: manager.first_name + ' ' + manager.last_name,
+                        value: manager.id,
+                    }),
                     ),
                 },
             ])
             .then((answer) => {
-                const role = role.find((role) => role.title === answer.roleId);
-                const manager = manager.find((manager) => `${manager.first_name} ${manager.last_name}` === answer.managerId);
                 connection.query('INSERT INTO employee SET ?',
                 {
                     first_name: answer.firstName,
                     last_name: answer.lastName,
-                    role_id: role.id,
-                    manager_id: manager.id,
+                    role_id: answer.roleId,
+                    manager_id: answer.managerId,
                 },
                 (err, res) => {
                     if (err) throw err;
