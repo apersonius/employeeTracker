@@ -1,5 +1,6 @@
 const inquirer = require('inquirer');
 const connection = require('./db/connection');
+const connect = require('./db/connection');
 
 function promptUser() {
     inquirer
@@ -198,3 +199,43 @@ function addEmployee() {
     })
 }
 
+function updateEmployeeRole() {
+    connection.query('SELECT * FROM employee', (err, employee) => {
+        if (err) throw err;
+        connection.query('SELECT * FROM role', (err, role) => {
+            if (err) throw err;
+            inquirer
+            .prompt([
+                {
+                    type: 'list',
+                    name: 'employee',
+                    message: 'select employee to update',
+                    choices: employee.map((employee) => ({
+                        name: `${employee.first_name} ${employee.last_name}`,
+                        value: employee.id,
+                    })),
+                },
+                {
+                    type: 'list',
+                    name: 'role',
+                    message: 'select the employees new role',
+                    choices: role.map((role) => ({
+                        name: role.title,
+                        value: role.id,
+                    })),
+                },
+            ])
+            .then((answer) => {
+                connection.query('UPDATE employee SEt role_id = ? WHERE id = ?',
+                [answer.role, answer.employee],
+                (err) => {
+                    if (err) throw err; 
+                    console.log('employee role updated');
+                    promptUser();
+                })
+            });
+        });
+    });
+}
+
+promptUser();
